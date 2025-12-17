@@ -1,0 +1,97 @@
+/* Custom properties from globals.css */
+:root {
+  --neon-green: #39FF14;
+  --dark-bg: #121212;
+  --dark-card: #1C1C1C;
+}
+
+/* Keyframe Animations */
+@keyframes pulse-slow {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(0.95); }
+}
+
+.navbar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: var(--dark-card);
+    border-top: 1px solid rgba(57, 255, 20, 0.3);
+    backdrop-filter: blur(5px);
+    z-index: 50;
+    box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.5); 
+}
+
+.navContainer {
+    max-width: 48rem;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-around; /* Changed to space-around for even spacing */
+    align-items: center;
+    padding: 0.75rem 0.5rem; 
+    position: relative;
+}
+
+.navLinks {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-right: 4rem; /* Give space for the floating button */
+}
+
+/* -------------------- Nav Item Hover Animation -------------------- */
+.navItem {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #9ca3af; /* gray-400 */
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); /* Smoother animation */
+    text-decoration: none;
+    padding: 0.5rem;
+}
+
+.navItem:hover {
+    color: var(--neon-green);
+    transform: scale(1.2); /* Big Animated Scale Up */
+    text-shadow: 0 0 5px rgba(57, 255, 20, 0.5); /* Neon text glow on hover */
+}
+/* ------------------------------------------------------------------ */
+
+.navText {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+/* Plus Button Styling (Create Post) */
+.plusLink {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%) translateY(-60%); /* Center and lift higher */
+    top: 0; 
+}
+
+.plusButton {
+    padding: 0.75rem 1.5rem;
+    background-color: var(--neon-green);
+    border-radius: 9999px; /* full rounded */
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    /* Neon Shadow and Animation */
+    box-shadow: 0 0 15px var(--neon-green), 0 0 30px rgba(57, 255, 20, 0.5);
+    border: 4px solid var(--dark-bg);
+    animation: pulse-slow 3s infinite;
+}
+
+.plusButton:hover {
+    transform: scale(1.05); /* Slightly bigger hover on the button itself */
+    animation: none; /* Pause pulse on hover */
+}
+
+.plusText {
+    color: var(--dark-bg);
+    font-weight: 900;
+    font-size: 1rem;
+    letter-spacing: 1px;
+}
