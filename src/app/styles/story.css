@@ -1,0 +1,23 @@
+@media (max-width: 480px) {
+
+  #storymain {
+    width: 90vw;
+    height: 25vh;
+    margin: 5vh auto;
+    background-color: red;
+    padding: 2vh;
+    position: relative;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    color: #e0e0e0;
+    font-size: 4vw;
+  }
+  .storyitems {
+    display: flex;
+    gap: 3vw;
+    overflow-x: auto;
+    padding-bottom: 1vh;
+    height: 5vh;
+    background-color: aliceblue;
+  }
+}

@@ -1,5 +1,9 @@
+import NavbarTop from "../components/topnavbar";
+
 export default function Team() {
   return (
+    <>
+    <NavbarTop/>
     <div className="page">
       <h1>➕ Create a Team</h1>
 
@@ -13,5 +17,6 @@ export default function Team() {
         </div>
       </div>
     </div>
+    </>
   );
 }

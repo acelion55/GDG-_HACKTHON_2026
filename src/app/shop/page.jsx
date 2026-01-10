@@ -1,5 +1,9 @@
+import NavbarTop from "../components/topnavbar";
+
+
 export default function Shop() {
-  return (
+  return (<>
+      <NavbarTop/>
     <div className="page">
       <h1>🛒 Rewards Shop</h1>
 
@@ -13,5 +17,6 @@ export default function Shop() {
         <p>🛍️ Coupon – 100 pts</p>
       </div>
     </div>
+    </>
   );
 }
