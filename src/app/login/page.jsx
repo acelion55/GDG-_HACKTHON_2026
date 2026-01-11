@@ -1,10 +1,9 @@
 "use client";
 import React, { useState } from "react";
-import style from "../../styles/login.module.css";
-import { User, Lock, ArrowRight, Globe, Mail, Loader2 } from "lucide-react";
+import style from "../styles/login.module.css";
+import { User, Lock, ArrowRight, Mail, Loader2 } from "lucide-react";
 
-// Check karein ki ye path aapke folder structure ke hisab se sahi hai
-import { auth, db } from "../../../../backend/login/signup"; 
+import { auth, db } from "../../../backend/login/signup"; 
 
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, getDoc, setDoc, collection, query, where, getDocs } from "firebase/firestore";

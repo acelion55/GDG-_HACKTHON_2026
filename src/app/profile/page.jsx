@@ -1,7 +1,7 @@
 "use client";
 import Follower from "./follower";
 import Postcard from "./postcard";
-import Login from "../login/signup/loginin"
+import Login from "../login/page"
 import style from "../styles/profile.module.css";
 import Createpost from "../components/createpost";
 import { useState } from "react";
