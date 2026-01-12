@@ -5,7 +5,7 @@ import styles from "../styles/Navbar.module.css"
 const createpost = () => {
   return (
     <>
-      <Link href="/upload" className={styles.plusLink}>
+      <Link href="/upload" >
         <div className={styles.plusButton}>
           <span className={styles.plusText}>POST</span>
         </div>

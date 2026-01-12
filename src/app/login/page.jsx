@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import style from "../styles/login.module.css";
 import { User, Lock, ArrowRight, Mail, Loader2 } from "lucide-react";
 
@@ -8,7 +9,8 @@ import { auth, db } from "../../../backend/login/signup";
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, getDoc, setDoc, collection, query, where, getDocs } from "firebase/firestore";
 
-export default function LoginPage({ onLogin }) {
+export default function LoginPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState(""); 
@@ -62,7 +64,7 @@ export default function LoginPage({ onLogin }) {
           createdAt: new Date(),
         });
 
-        onLogin(username);
+        router.push("/");
       } else {
         // --- LOGIN LOGIC ---
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
@@ -73,10 +75,10 @@ export default function LoginPage({ onLogin }) {
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
-          onLogin(docSnap.data().username);
+          router.push("/");
         } else {
           // Fallback agar Firestore data delete ho gaya ho
-          onLogin(user.email.split('@')[0]);
+          router.push("/");
         }
       }
     } catch (error) {

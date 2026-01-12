@@ -4,7 +4,6 @@ export default function StatsCard() {
   return (
     <div className={style.postcard}>
       <img
-        src=""
         alt="not found"
         style={{
           height: "12vh",

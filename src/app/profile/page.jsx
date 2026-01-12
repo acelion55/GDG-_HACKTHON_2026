@@ -1,18 +1,46 @@
 "use client";
+import { useState, useEffect } from "react";
 import Follower from "./follower";
 import Postcard from "./postcard";
-import Login from "../login/page"
 import style from "../styles/profile.module.css";
 import Createpost from "../components/createpost";
-import { useState } from "react";
+import { auth, db } from "../../../backend/login/signup";
+import { doc, getDoc } from "firebase/firestore";
 
 export default function ProfilePage() {
-
   const [username, setUsername] = useState("");
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-   if (username == "") {
-       return(<Login onLogin={(name) => setUsername(name)}/>);
-   }else return (
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged(async (currentUser) => {
+      if (currentUser) {
+        try {
+          const docRef = doc(db, "users", currentUser.uid);
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            setUsername(data.username);
+            setUserData(data);
+          }
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+        }
+      } else {
+        window.location.href = "/login";
+      }
+      setLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  if (loading) {
+    return (
+      <div style={{ textAlign: "center", marginTop: "50vh" }}>Loading...</div>
+    );
+  }
+
+  return (
     <div className={style.profilepage}>
       <div className={style.profileup}>
         <div className={style.imgbar}>
@@ -38,18 +66,8 @@ export default function ProfilePage() {
                   fontWeight: "bolder",
                 }}
               >
-                hi{username}
+                Hi, {username}
               </h1>
-              <h1
-                style={{
-                  fontSize: "1.5rem",
-                  fontWeight: "bolder",
-                  position: "absolute",
-                  top: "20vh",
-                  left: "4vw",
-                  color: "black",
-                }}
-              ></h1>
             </div>
           </div>
         </div>

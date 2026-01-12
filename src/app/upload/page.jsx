@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import style from "../styles/uploadpage.module.css";
+import { getDoc,doc } from "firebase/firestore";
 import { Camera, MapPin, ChevronRight, ArrowLeft, HelpCircle, Send } from "lucide-react";
 
 const UploadReport = () => {
