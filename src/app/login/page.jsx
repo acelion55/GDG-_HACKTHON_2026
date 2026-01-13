@@ -24,7 +24,7 @@ export default function LoginPage() {
       const querySnapshot = await getDocs(q);
       return !querySnapshot.empty;
     } catch (err) {
-      console.error("Firestore Error:", err);
+      console.error("Firestore Error:", err);                   
       return false;
     }
   };
@@ -61,6 +61,7 @@ export default function LoginPage() {
           views: 0,
           posts: 0,
           likes: 0,
+          uid : user.uid,
           createdAt: new Date(),
         });
 

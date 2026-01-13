@@ -1,11 +1,18 @@
 "use client";
 import React, { useState } from "react";
+import { auth,db } from "../../../backend/login/signup";
 import style from "../styles/uploadpage.module.css";
-import { getDoc,doc } from "firebase/firestore";
-import { Camera, MapPin, ChevronRight, ArrowLeft, HelpCircle, Send } from "lucide-react";
+import { collection, addDoc, serverTimestamp, updateDoc, doc, increment} from "firebase/firestore";
+import {
+  Camera,
+  MapPin,
+  ChevronRight,
+  ArrowLeft,
+  HelpCircle,
+  Send,
+} from "lucide-react";
 
 const UploadReport = () => {
-  // 1. State for Form Data
   const [formData, setFormData] = useState({
     description: "",
     areaImpact: "High",
@@ -14,50 +21,131 @@ const UploadReport = () => {
     image: null,
     imagePreview: null,
   });
+  const [isUploading, setIsUploading] = useState(false);
 
-  // 2. Handle Image Selection
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       setFormData({
         ...formData,
         image: file,
-        imagePreview: URL.createObjectURL(file), // Preview dikhane ke liye
+        imagePreview: URL.createObjectURL(file),
       });
     }
   };
 
-  // 3. Handle Submit
-  const handleSubmit = (e) => {
+  const uploadToCloudinary = async (file) => {
+    const cloudName=process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+    const uploadPreset=process.env.NEXT_PUBLIC_CLOUDINARY_PRESET;
+    
+    if (!cloudName || !uploadPreset) {
+      console.error("Cloudinary credentials missing in .env file!");
+      return null;
+    }
+
+    const data = new FormData();
+    data.append("file", file);
+    data.append("upload_preset", uploadPreset);
+
+    const res = await fetch(
+      `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
+      { method: "POST", body: data }
+    );
+    const fileData = await res.json();
+    return fileData.secure_url;
+  };
+
+  const handleSubmit = async (e) => {
+ 
     e.preventDefault();
-    console.log("Submitting Data to Server:", formData);
-    alert("Report Submitted Successfully! You earned 100 ZAP points.");
-    // Yahan aap apna Firebase ya API call daal sakte hain
+
+    const user = auth.currentUser;
+    if (!user) {
+      alert("please login first to submit a report!")
+      return;
+    }
+
+    // checking if image is inserted or not
+    if (!formData.image) {
+      alert("Please upload a photo first!");
+      return;
+    }
+
+    setIsUploading(true); 
+
+    try {
+      // sending image to cloudinary
+      console.log("Uploading image to Cloudinary...");
+      const imageUrl = await uploadToCloudinary(formData.image);
+
+      if (!imageUrl) throw new Error("Image upload failed");
+
+     const finalReportData = {
+      userId: user.uid,
+        description: formData.description,
+        areaImpact: formData.areaImpact,
+        garbageType: formData.garbageType,
+        imageUrl: imageUrl, 
+        status: "pending",
+        createdAt: serverTimestamp(),
+      };
+
+
+      alert("Report Submitted Successfully!");
+      
+      await addDoc(collection(db, "reports"), finalReportData);
+
+      // 3. User ka post count badhayein (+1)
+  const userRef = doc(db, "users", auth.currentUser.uid); // User ka rasta
+  
+  await updateDoc(userRef, {
+    posts: increment(1), // Automatic +1 ho jayega
+     //zapPoints: increment(100) Sath mein points bhi badha sakte hain!
+  });
+
+  alert("Post updated and 100 points earned!");
+      setFormData({
+        description: "", areaImpact: "High", garbageType: "Plastic",
+        location: null, image: null, imagePreview: null,
+      });
+
+    } catch (error) {
+      console.error("Error during submission:", error);
+      alert("Something went wrong. Please try again.");
+    } finally {
+      setIsUploading(false); // Loading stop
+    }
   };
 
   return (
     <div className={style.uploadpage}>
       <div className={style.navbar}>
-        <ArrowLeft className={style.navIcon} onClick={() => window.history.back()} />
+        <ArrowLeft
+          className={style.navIcon}
+          onClick={() => window.history.back()}
+        />
         <h1 className={style.navTitle}>NEW REPORT</h1>
         <HelpCircle className={style.navIcon} />
       </div>
 
       <form className={style.formContainer} onSubmit={handleSubmit}>
-        
         {/* Evidence Photo Section */}
         <div className={style.section}>
           <label className={style.sectionLabel}>EVIDENCE PHOTO</label>
-          <input 
-            type="file" 
-            id="imageInput" 
-            accept="image/*" 
-            onChange={handleImageChange} 
-            hidden 
+          <input
+            type="file"
+            id="imageInput"
+            accept="image/*"
+            onChange={handleImageChange}
+            hidden
           />
           <label htmlFor="imageInput" className={style.photoUploadBox}>
             {formData.imagePreview ? (
-              <img src={formData.imagePreview} alt="Preview" className={style.previewImg} />
+              <img
+                src={formData.imagePreview}
+                alt="Preview"
+                className={style.previewImg}
+              />
             ) : (
               <>
                 <div className={style.cameraCircle}>
@@ -71,8 +159,8 @@ const UploadReport = () => {
         </div>
 
         {/* GPS Location Section (Simulation) */}
-        <div 
-          className={style.locationBox} 
+        <div
+          className={style.locationBox}
           onClick={() => alert("Fetching GPS Location...")}
         >
           <div className={style.iconWrapper}>
@@ -89,12 +177,14 @@ const UploadReport = () => {
         <div className={style.section}>
           <label className={style.sectionLabel}>DESCRIPTION</label>
           <div className={style.inputWrapper}>
-            <textarea 
+            <textarea
               name="description"
-              placeholder="Describe the issue in detail..." 
+              placeholder="Describe the issue in detail..."
               className={style.textArea}
               value={formData.description}
-              onChange={(e) => setFormData({...formData, description: e.target.value})}
+              onChange={(e) =>
+                setFormData({ ...formData, description: e.target.value })
+              }
               required
             />
           </div>
@@ -104,10 +194,12 @@ const UploadReport = () => {
         <div className={style.statsRow}>
           <div className={style.statBox}>
             <label className={style.statLabel}>AREA IMPACT</label>
-            <select 
+            <select
               className={style.selectInput}
               value={formData.areaImpact}
-              onChange={(e) => setFormData({...formData, areaImpact: e.target.value})}
+              onChange={(e) =>
+                setFormData({ ...formData, areaImpact: e.target.value })
+              }
             >
               <option value="High">High</option>
               <option value="Medium">Medium</option>
@@ -116,10 +208,12 @@ const UploadReport = () => {
           </div>
           <div className={style.statBox}>
             <label className={style.statLabel}>GARBAGE TYPE</label>
-            <select 
+            <select
               className={style.selectInput}
               value={formData.garbageType}
-              onChange={(e) => setFormData({...formData, garbageType: e.target.value})}
+              onChange={(e) =>
+                setFormData({ ...formData, garbageType: e.target.value })
+              }
             >
               <option value="Plastic">Plastic</option>
               <option value="Organic">Organic</option>
@@ -129,8 +223,13 @@ const UploadReport = () => {
         </div>
 
         {/* Submit Button */}
-        <button type="submit" className={style.submitButton}>
-          SUBMIT REPORT <Send size={18} style={{marginLeft: '10px'}} />
+        <button
+          type="submit"
+          className={style.submitButton}
+          disabled={isUploading}
+          >
+          {isUploading ? "UPLOADING..." : "SUBMIT REPORT"}
+          {!isUploading && <Send size={18} style={{ marginLeft: "10px" }} />}
         </button>
       </form>
     </div>

@@ -4,12 +4,14 @@ import Follower from "./follower";
 import Postcard from "./postcard";
 import style from "../styles/profile.module.css";
 import Createpost from "../components/createpost";
+
 import { auth, db } from "../../../backend/login/signup";
 import { doc, getDoc } from "firebase/firestore";
 
 export default function ProfilePage() {
+  
   const [username, setUsername] = useState("");
-  const [userData, setUserData] = useState(null);
+  const [userdata, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -44,11 +46,11 @@ export default function ProfilePage() {
     <div className={style.profilepage}>
       <div className={style.profileup}>
         <div className={style.imgbar}>
-          <div className={style.back}>back</div>
+          <div className={style.back}>log out</div>
           <div
             style={{
-              marginTop: "4vh",
-              marginLeft: "88vw",
+              marginTop: "3vh",
+              marginLeft: "75vw",
               position: "absolute",
               height: "10vh",
             }}
