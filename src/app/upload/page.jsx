@@ -1,8 +1,16 @@
 "use client";
 import React, { useState } from "react";
-import { auth,db } from "../../../backend/login/signup";
+import { auth, db } from "../../../backend/login/signup";
 import style from "../styles/uploadpage.module.css";
-import { collection, addDoc, serverTimestamp, updateDoc, doc, increment} from "firebase/firestore";
+import checkIsGarbage from "../../../backend/login/aigarbagecheck"; // Server Action
+import {
+  collection,
+  addDoc,
+  serverTimestamp,
+  updateDoc,
+  doc,
+  increment,
+} from "firebase/firestore";
 import {
   Camera,
   MapPin,
@@ -23,6 +31,7 @@ const UploadReport = () => {
   });
   const [isUploading, setIsUploading] = useState(false);
 
+  // --- Helpers ---
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -34,14 +43,17 @@ const UploadReport = () => {
     }
   };
 
+  const convertToBase64 = (file) => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result.split(",")[1]);
+      reader.readAsDataURL(file);
+    });
+  };
+
   const uploadToCloudinary = async (file) => {
-    const cloudName=process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-    const uploadPreset=process.env.NEXT_PUBLIC_CLOUDINARY_PRESET;
-    
-    if (!cloudName || !uploadPreset) {
-      console.error("Cloudinary credentials missing in .env file!");
-      return null;
-    }
+    const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+    const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_PRESET;
 
     const data = new FormData();
     data.append("file", file);
@@ -49,71 +61,84 @@ const UploadReport = () => {
 
     const res = await fetch(
       `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
-      { method: "POST", body: data }
+      {
+        method: "POST",
+        body: data,
+      }
     );
     const fileData = await res.json();
     return fileData.secure_url;
   };
 
+  // --- Main Logic ---
   const handleSubmit = async (e) => {
- 
     e.preventDefault();
-
     const user = auth.currentUser;
-    if (!user) {
-      alert("please login first to submit a report!")
-      return;
-    }
 
-    // checking if image is inserted or not
-    if (!formData.image) {
-      alert("Please upload a photo first!");
-      return;
-    }
+    if (!user) return alert("Please login first!");
+    if (!formData.image) return alert("Please upload a photo first!");
 
-    setIsUploading(true); 
+    setIsUploading(true);
 
     try {
-      // sending image to cloudinary
-      console.log("Uploading image to Cloudinary...");
-      const imageUrl = await uploadToCloudinary(formData.image);
+      // Step 1: AI Analysis
+      console.log("AI Scanning for garbage...");
+      const base64Data = await convertToBase64(formData.image);
+      const isGarbageFound = await checkIsGarbage(
+        base64Data,
+        formData.image.type
+      );
 
+      const { isGarbage, explanation } = await checkIsGarbage(base64Data, formData.image.type);
+
+      alert("AI Analysis: " + explanation);
+
+      if (!isGarbageFound) {
+        alert(
+          "AI Alert: Garbage not detected! Please upload a clear photo of waste."
+        );
+        setIsUploading(false);
+        return;
+      }
+
+      // Step 2: Cloudinary Upload
+      console.log("Uploading image...");
+      const imageUrl = await uploadToCloudinary(formData.image);
       if (!imageUrl) throw new Error("Image upload failed");
 
-     const finalReportData = {
-      userId: user.uid,
+      // Step 3: Firestore Database Save
+      const reportData = {
+        userId: user.uid,
         description: formData.description,
         areaImpact: formData.areaImpact,
         garbageType: formData.garbageType,
-        imageUrl: imageUrl, 
+        imageUrl: imageUrl,
         status: "pending",
         createdAt: serverTimestamp(),
       };
+      await addDoc(collection(db, "reports"), reportData);
 
-
-      alert("Report Submitted Successfully!");
-      
-      await addDoc(collection(db, "reports"), finalReportData);
-
-      // 3. User ka post count badhayein (+1)
-  const userRef = doc(db, "users", auth.currentUser.uid); // User ka rasta
-  
-  await updateDoc(userRef, {
-    posts: increment(1), // Automatic +1 ho jayega
-     //zapPoints: increment(100) Sath mein points bhi badha sakte hain!
-  });
-
-  alert("Post updated and 100 points earned!");
-      setFormData({
-        description: "", areaImpact: "High", garbageType: "Plastic",
-        location: null, image: null, imagePreview: null,
+      // Step 4: Update User Profile (ZAP Points)
+      const userRef = doc(db, "users", user.uid);
+      await updateDoc(userRef, {
+        posts: increment(1),
+        zapPoints: increment(100),
       });
 
+      alert("Success! 100 Points earned! 🚀");
+      setFormData({
+        description: "",
+        areaImpact: "High",
+        garbageType: "Plastic",
+        location: null,
+        image: null,
+        imagePreview: null,
+      });
     } catch (error) {
-      console.error("Error during submission:", error);
-      alert("Something went wrong. Please try again.");
+      console.error("Error:", error);
+      alert("Something went wrong: " + error.message);
     } finally {
-      setIsUploading(false); // Loading stop
+      setIsUploading(false);
     }
   };
 
@@ -227,7 +252,7 @@ const UploadReport = () => {
           type="submit"
           className={style.submitButton}
           disabled={isUploading}
-          >
+        >
           {isUploading ? "UPLOADING..." : "SUBMIT REPORT"}
           {!isUploading && <Send size={18} style={{ marginLeft: "10px" }} />}
         </button>
