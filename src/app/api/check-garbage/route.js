@@ -5,12 +5,21 @@ export async function POST(req) {
     const { base64Image, mimeType } = await req.json();
 
     const apiKey = process.env.GEMINI_API_KEY;
+
     if (!apiKey) {
-      return Response.json(
-        { isGarbage: false, explanation: "API Key missing in .env.local" },
-        { status: 500 }
-      );
+       console.error("Vercel Key Status: NOT FOUND");
+       return Response.json({ isGarbage: false, explanation: "Server Error: API Key not found in Environment" }, { status: 500 });
     }
+    
+    if (!apiKey) {
+  return Response.json(
+    { 
+      isGarbage: false, 
+      explanation: `Environment Variable Missing! Current Keys: ${Object.keys(process.env).filter(k => k.includes('GEMINI'))}` 
+    },
+    { status: 500 }
+  );
+}
 
     if (!base64Image || !mimeType) {
       return Response.json(
