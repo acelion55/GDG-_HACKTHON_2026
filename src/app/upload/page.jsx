@@ -2,7 +2,6 @@
 import React, { useState } from "react";
 import { auth, db } from "../../../backend/login/signup";
 import style from "../styles/uploadpage.module.css";
-import checkIsGarbage from "../../../backend/login/aigarbagecheck"; // Server Action
 import {
   collection,
   addDoc,
@@ -55,6 +54,10 @@ const UploadReport = () => {
     const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
     const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_PRESET;
 
+    if (!cloudName || !uploadPreset) {
+      throw new Error("Cloudinary credentials missing in .env.local");
+    }
+
     const data = new FormData();
     data.append("file", file);
     data.append("upload_preset", uploadPreset);
@@ -64,9 +67,19 @@ const UploadReport = () => {
       {
         method: "POST",
         body: data,
-      }
+      } 
     );
+
+    if (!res.ok) {
+      throw new Error(`Cloudinary upload failed: ${res.statusText}`);
+    }
+
     const fileData = await res.json();
+    
+    if (!fileData.secure_url) {
+      throw new Error("Cloudinary did not return image URL");
+    }
+
     return fileData.secure_url;
   };
 
@@ -84,25 +97,39 @@ const UploadReport = () => {
       // Step 1: AI Analysis
       console.log("AI Scanning for garbage...");
       const base64Data = await convertToBase64(formData.image);
-      const isGarbageFound = await checkIsGarbage(
-        base64Data,
-        formData.image.type
-      );
+      
+      // Call API to check if image contains garbage
+      const checkRes = await fetch("/api/check-garbage", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          base64Image: base64Data,
+          mimeType: formData.image.type,
+        }),
+      });
 
-      const { isGarbage, explanation } = await checkIsGarbage(base64Data, formData.image.type);
+      const checkData = await checkRes.json();
+      console.log("AI Analysis Result:", checkData);
 
-      alert("AI Analysis: " + explanation);
+      if (!checkRes.ok) {
+        throw new Error(checkData.explanation || "AI Analysis failed");
+      }
 
-      if (!isGarbageFound) {
+      alert("AI Analysis: " + checkData.explanation);
+
+      // IMPORTANT: Only upload if garbage IS detected
+      if (!checkData.isGarbage) {
         alert(
-          "AI Alert: Garbage not detected! Please upload a clear photo of waste."
+          "No garbage detected! Please upload a clear photo of waste/garbage."
         );
         setIsUploading(false);
         return;
       }
 
+      alert("Garbage detected! Proceeding with upload...");
+
       // Step 2: Cloudinary Upload
-      console.log("Uploading image...");
+      console.log("Uploading image to Cloudinary...");
       const imageUrl = await uploadToCloudinary(formData.image);
       if (!imageUrl) throw new Error("Image upload failed");
 
@@ -125,7 +152,7 @@ const UploadReport = () => {
         zapPoints: increment(100),
       });
 
-      alert("Success! 100 Points earned! 🚀");
+      alert("Success! 100 Points earned!");
       setFormData({
         description: "",
         areaImpact: "High",
