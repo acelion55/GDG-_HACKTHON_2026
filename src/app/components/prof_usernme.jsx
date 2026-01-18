@@ -14,7 +14,7 @@ function profusernme(props) {
         />
       </div>
 
-      <h1 className={style.username}>Hi,{props.username}</h1>
+      <h1 className={style.username}>{props.username}</h1>
     </div>
   );
 }

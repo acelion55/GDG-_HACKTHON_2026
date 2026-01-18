@@ -215,7 +215,7 @@ const Posts = ({ username }) => {
               const postId = postRefMap.current[index];
               
               if (postId && !viewedPostIds.has(postId)) {
-                console.log("Incrementing view for post:", postId);
+                // console.log("Incrementing view for post:", postId);
                 incrementPostView(postId);
                 setViewedPostIds((prev) => new Set([...prev, postId]));
               }
@@ -277,7 +277,7 @@ const Posts = ({ username }) => {
               if (el) {
                 postRefMap.current[index] = post.id;
               }
-            }}
+            }} 
             id={`post-${post.id}`}
           >
             {loadedPostIds.has(post.id) ? (
@@ -300,8 +300,28 @@ const Posts = ({ username }) => {
 
                 {/* Content Section */}
                 <div className={styles.postContent}>
-                  {/* Like Button with Stats */}
-                  <div className={styles.likeSection}>
+                 
+
+                  {/* Description */}
+                  <div className={styles.description}>
+                    {post.description}
+                  </div>
+
+                  {/* Location/Address */}
+                  {post.address && (
+                    <div className={styles.locationInfo}>
+                      📍 {post.address}
+                    </div>
+                  )}
+
+                  {/* Post Meta Info */}
+                  <div className={styles.postMeta}>
+                    <span className={styles.metaViews}>👁️ {post.views || 0} views</span>
+                    <span className={styles.metaType}>{post.garbageType && `🗑️ ${post.garbageType}`}</span>
+                  </div>
+
+                 {/* Like Button with Stats */}
+                   <div className={styles.likeSection}>
                     {currentUserId && (
                       <button
                         onClick={() => {
@@ -337,17 +357,6 @@ const Posts = ({ username }) => {
                         )}
                       </button>
                     )}
-                  </div>
-
-                  {/* Description */}
-                  <div className={styles.description}>
-                    {post.description}
-                  </div>
-
-                  {/* Post Meta Info */}
-                  <div className={styles.postMeta}>
-                    <span className={styles.metaViews}>👁️ {post.views || 0} views</span>
-                    <span className={styles.metaType}>{post.garbageType && `📍 ${post.garbageType}`}</span>
                   </div>
                 </div>
               </div>
