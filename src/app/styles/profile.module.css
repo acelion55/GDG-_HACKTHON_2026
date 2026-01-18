@@ -1,114 +1,175 @@
 @media (max-width: 480px) {
   .profilepage {
     height: 100vh;
-    background-color: black;
+    background: linear-gradient(135deg, #0f1419 0%, #1a1f2e 50%, #0f1419 100%);
     color: white;
+    overflow-y: auto;
   }
+  
   .profileup {
     height: 35vh;
     z-index: 2;
     border-bottom-left-radius: 3vh;
     border-bottom-right-radius: 3vh;
-    background-color: yellowgreen;
+    background: linear-gradient(135deg, #1a472a 0%, #2d6a4f 50%, #1b4332 100%);
+    box-shadow: 0 10px 40px rgba(57, 255, 20, 0.2);
+    border: 1px solid rgba(57, 255, 20, 0.3);
   }
-  .imgbar{
+  
+  .imgbar {
     height: 33vh;
     display: flex;
+    position: relative;
   }
-  .img{
+  
+  .img {
     height: 15vh;
     width: 15vh;
     border-radius: 50%;
-    margin-left:  5vw;
-    background-color: black;
+    margin-left: 5vw;
+    background: linear-gradient(135deg, #39FF14 0%, #2dd36f 100%);
+    box-shadow: 0 0 30px rgba(57, 255, 20, 0.6), inset 0 0 20px rgba(255, 255, 255, 0.1);
+    border: 3px solid rgba(57, 255, 20, 0.5);
   }
-  .imguserbox{
+  
+  .imguserbox {
     margin-left: 30%;
     margin-top: 8vh;
   }
-  .back{
-    background-color: aqua;
+  
+  .back {
+    background: linear-gradient(135deg, #39FF14 0%, #2dd36f 100%);
     width: 20vw;
     color: black;
     font-weight: 800;
     font-size: 1.5rem;
     top: 2.5vh;
-    border: 3px solid black;
-    border-radius: 1vh;
+    border: 2px solid rgba(57, 255, 20, 0.8);
+    border-radius: 1.5vh;
     left: 4vw;
     text-align: center;
     height: 5vh;
     position: absolute;
+    box-shadow: 0 0 20px rgba(57, 255, 20, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    transition: all 0.3s ease;
+    cursor: pointer;
   }
-  .followbox{
+  
+  .back:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 25px rgba(57, 255, 20, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  }
+  
+  .back:active {
+    transform: translateY(-1px);
+  }
+  
+  .followbox {
     height: 10vh;
     display: flex;
     flex-direction: row;
     justify-content: space-evenly;
     z-index: 0;
+    padding: 0 1vw;
   }
-  .postcount{
-    color: black;
+  
+  .postcount {
+    color: white;
     height: 6vh;
     width: 30vw;
     align-items: center;
-    border-radius: 0.5rem;
+    border-radius: 1.5vh;
     margin-top: 3vh;
     display: flex;
-    background-color: aliceblue;
+    background: linear-gradient(135deg, rgba(57, 255, 20, 0.15) 0%, rgba(45, 211, 111, 0.1) 100%);
     flex-direction: row;
     gap: 2vw;
     font-size: 1.5rem;
     justify-content: center;
+    border: 1px solid rgba(57, 255, 20, 0.3);
+    box-shadow: 0 4px 15px rgba(57, 255, 20, 0.1);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
   }
-  .postcard{
-    background-color: aqua;
+  
+  .postcount:hover {
+    background: linear-gradient(135deg, rgba(57, 255, 20, 0.25) 0%, rgba(45, 211, 111, 0.15) 100%);
+    border-color: rgba(57, 255, 20, 0.6);
+    box-shadow: 0 6px 25px rgba(57, 255, 20, 0.2);
+  }
+  
+  .postcard {
+    background: linear-gradient(135deg, rgba(57, 255, 20, 0.08) 0%, rgba(45, 211, 111, 0.05) 100%);
     height: 13vh;
-    border-radius: 0.5rem;
+    border-radius: 1.5vh;
     width: 95vw;
     display: flex;
     flex-direction: row;
     margin-left: 2.5vw;
+    border: 1px solid rgba(57, 255, 20, 0.2);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
   }
-  .postcardpara{
+  
+  .postcard:hover {
+    border-color: rgba(57, 255, 20, 0.4);
+    box-shadow: 0 6px 25px rgba(57, 255, 20, 0.15);
+    transform: translateY(-2px);
+  }
+  
+  .postcardpara {
     height: 12vh;
     width: 55vw;
     margin-top: -1vh;
     font-size: 1.4rem;
     overflow: hidden;
     margin-left: 6vw;
+    color: #ccc;
   }
+  
   .grid {
-  /* background-color: lightpink; */
-  height: 40vh; 
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  padding: 10px;
-}
+    height: 40vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+  }
+  
   .posting {
     object-fit: cover;
     overflow: hidden;
   }
+  
   .imgbox {
     overflow: hidden;
     height: 11vh;
     margin-top: 1vh;
     margin-left: 2vw;
     width: 30vw;
-    background-color: lightgreen;
+    background: linear-gradient(135deg, rgba(57, 255, 20, 0.1), rgba(45, 211, 111, 0.08));
+    border-radius: 1vh;
+    border: 1px solid rgba(57, 255, 20, 0.2);
   }
-  .card {
-  background-color: rgba(38, 58, 68, 0.795);
-  display: flex;  
-  flex-direction: row; 
-  margin-top: 1vh;
-  align-items: center;
-  flex-shrink: 0;  
-  height: 13vh;
-  border-radius: 0.5rem;
-  width: 100%;  
-  overflow: hidden;
-}
   
+  .card {
+    background: linear-gradient(135deg, rgba(38, 58, 68, 0.9) 0%, rgba(45, 70, 80, 0.8) 100%);
+    display: flex;
+    flex-direction: row;
+    margin-top: 1vh;
+    align-items: center;
+    flex-shrink: 0;
+    height: 13vh;
+    border-radius: 1.5vh;
+    width: 100%;
+    overflow: hidden;
+    border: 1px solid rgba(57, 255, 20, 0.2);
+    box-shadow: 0 4px 15px rgba(57, 255, 20, 0.1);
+    transition: all 0.3s ease;
+  }
+  
+  .card:hover {
+    border-color: rgba(57, 255, 20, 0.4);
+    box-shadow: 0 6px 25px rgba(57, 255, 20, 0.15);
+    transform: translateY(-2px);
+  }
 }

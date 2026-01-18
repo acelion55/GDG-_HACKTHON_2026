@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Follower from "./follower";
 import Postcard from "./postcard";
 import style from "../styles/profile.module.css";
@@ -7,12 +8,22 @@ import Createpost from "../components/createpost";
 
 import { auth, db } from "../../../backend/login/signup";
 import { doc, getDoc } from "firebase/firestore";
+import { signOut } from "firebase/auth";
 
 export default function ProfilePage() {
-  
+  const router = useRouter();
   const [username, setUsername] = useState("");
   const [userdata, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      router.push("/login");
+    } catch (error) {
+      console.error("Error logging out:", error);
+    }
+  };
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (currentUser) => {
@@ -46,7 +57,7 @@ export default function ProfilePage() {
     <div className={style.profilepage}>
       <div className={style.profileup}>
         <div className={style.imgbar}>
-          <div className={style.back}>log out</div>
+          <div className={style.back} onClick={handleLogout} style={{ cursor: "pointer" }}>log out</div>
           <div
             style={{
               marginTop: "3vh",

@@ -5,7 +5,7 @@ export default function profileup() {
   return (
     <div className={style.profileup}>
       <div className={style.imgbar}>
-        <div className={style.back}>back</div>
+        
         <div
           style={{
             marginTop: "4vh",

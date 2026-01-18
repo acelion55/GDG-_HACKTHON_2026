@@ -6,6 +6,7 @@ const Navbar = () => {
     { name: "HOME", href: "/" },
     { name: "SHOP", href: "/shop" },
     { name: "TEAM", href: "/team" },
+    { name: "PROFILE", href: "/profile" },
   ];
 
   return (

@@ -3,9 +3,9 @@ import {useState, useEffect} from "react";
 import { auth,db } from "../../../backend/login/signup"; 
 import React from "react";
 import {doc, getDoc} from "firebase/firestore";
-import "../styles/main.css"
 import CreatePost from "../components/createpost";
-import style from "../styles/Navbar.module.css";
+import Prafuser from "./prof_usernme"
+import style from "../styles/main.module.css";
 import Link from "next/link";
 
 const topnavbar = () => {
@@ -29,43 +29,21 @@ const topnavbar = () => {
     })
     return() => unsubscribe();
   }, []);
-
-  const handleLogout = async () => {
-    try {
-      await auth.signOut();
-      setUsername("");
-      window.location.href = "/";
-    } catch (error) {
-      console.error("Logout error:", error);
-    }
-  };
-   
-  
+ 
 
     return (
-      <div id="topintro">
+      <div className={style.topintro}>
       {user ? (
         <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
-          <h1 style={{color: "white"}}>Hi, {username}</h1>
+           
+            <Prafuser username={username}/>
           
-          <button onClick={handleLogout} className={style.logoutBtn}>
-            Logout
-          </button>
-          
-          <div style={{position: "relative", marginLeft: "8vh" , height: "8vh",marginTop: "1vh",width: "50vw",}}>
-            <div style={{marginTop: "2vh",}}>
+         
+            <div >
                <CreatePost />
-            </div>
-             <Link href="/profile">
-            <div id="profile" >
-              <img
-                style={{ borderRadius: "50%", objectFit: "cover",}}
-                src="./globe.svg"
-                alt="Profile"
-              />
-            </div>
-          </Link>
-          </div>
+                       
+          </div> 
+
         </div>
       ) : (
         <div  style={{marginLeft: "60vw"}}>

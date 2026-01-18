@@ -1,0 +1,33 @@
+
+
+@media (max-width: 480px) {
+ 
+  .topintro{
+    height: 8vh;
+    position: relative;
+    width: 100vw;
+      background-color: #152400;
+  }
+  .username {
+     font-size: 1.6rem;
+     margin-top: 2vh;
+     color: aliceblue;
+  }
+  .creatpost{
+    height: 6vh;
+    width: 6vh;
+    border-radius: 50%;
+    background-color: seashell;
+    top: 20;
+    right: 100;
+  }
+  .profile{
+    height: 6vh;
+    width: 6vh;
+    border-radius: 50%;
+    background-color: seashell;
+    margin-top: 1vh;
+    margin-left: 3vw;
+    
+  }
+}

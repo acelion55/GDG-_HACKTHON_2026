@@ -1,6 +1,6 @@
 import style from "../styles/profile.module.css"
 import { db, auth } from "../../../backend/login/signup"; 
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, collection, query, where, getDocs } from "firebase/firestore";
 import { useState, useEffect } from "react";
 
 
@@ -11,16 +11,30 @@ export default function Follower() {
 
   useEffect(() => {
     const getData = async () => {
-      const user = auth.currentUser; // Pata lagao kaunsa user login hai
+      const user = auth.currentUser;
       if (user) {
-        const docRef = doc(db, "users", user.uid);
-        const docSnap = await getDoc(docRef);
+        try {
+          const docRef = doc(db, "users", user.uid);
+          const docSnap = await getDoc(docRef);
 
-        if (docSnap.exists()) {
-          // 2. Database se likes nikaalo aur state mein daal do
-          setLikes(docSnap.data().likes || 0); 
-          setViews(docSnap.data().views || 0);
-          setPosts(docSnap.data().posts || 0);
+          if (docSnap.exists()) {
+            setLikes(docSnap.data().likes || 0); 
+            setPosts(docSnap.data().posts || 0);
+          }
+
+          // Fetch all posts by this user and sum their views
+          const reportsRef = collection(db, "reports");
+          const q = query(reportsRef, where("userId", "==", user.uid));
+          const querySnapshot = await getDocs(q);
+          
+          let totalViews = 0;
+          querySnapshot.forEach((doc) => {
+            totalViews += doc.data().views || 0;
+          });
+          
+          setViews(totalViews);
+        } catch (error) {
+          console.error("Error fetching data:", error);
         }
       }
     };

@@ -1,7 +1,6 @@
 "use client";
 import  "../app/styles/Navbar.module.css"
-import AnimatedList from "./components/animatedlist.jsx";
-import Post from "./components/page1post";
+import Post from "./home/page1post";
 import Navbartop from "./components/topnavbar";
 
 const items = [
@@ -22,14 +21,7 @@ export default function Home() {
   return (
     <>
     <Navbartop/>
-    <div style={{height: "85vh",display: "flex", flexDirection: "column"}} id="maindiv">
-      <AnimatedList
-        items={items}
-        onItemSelect={(item, index) => console.log(item, index)}
-        showGradients={true}
-        enableArrowNavigation={true}
-        displayScrollbar={true}
-      />
+    <div style={{height: "85vh",display: "flex", flexDirection: "column",height: "100vh",backgroundColor: "black"}} id="maindiv">
       
       <Post/>
      

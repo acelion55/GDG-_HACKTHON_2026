@@ -29,6 +29,7 @@ const UploadReport = () => {
     imagePreview: null,
   });
   const [isUploading, setIsUploading] = useState(false);
+  const [isGettingLocation, setIsGettingLocation] = useState(false);
 
   // --- Helpers ---
   const handleImageChange = (e) => {
@@ -48,6 +49,40 @@ const UploadReport = () => {
       reader.onloadend = () => resolve(reader.result.split(",")[1]);
       reader.readAsDataURL(file);
     });
+  };
+
+  const getLocation = () => {
+    setIsGettingLocation(true);
+    if (!navigator.geolocation) {
+      alert("Geolocation is not supported by your browser");
+      setIsGettingLocation(false);
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        setFormData({
+          ...formData,
+          location: { latitude, longitude },
+        });
+        setIsGettingLocation(false);
+      },
+      (error) => {
+        console.error("Geolocation error:", error);
+        let errorMsg = "Unable to fetch location";
+        if (error.code === 1) {
+          errorMsg = "Permission denied. Please enable location access.";
+        } else if (error.code === 2) {
+          errorMsg = "Position unavailable. Please try again.";
+        } else if (error.code === 3) {
+          errorMsg = "Location request timed out. Please try again.";
+        }
+        alert(errorMsg);
+        setIsGettingLocation(false);
+      },
+      { timeout: 10000, enableHighAccuracy: true }
+    );
   };
 
   const uploadToCloudinary = async (file) => {
@@ -115,8 +150,6 @@ const UploadReport = () => {
         throw new Error(checkData.explanation || "AI Analysis failed");
       }
 
-      alert("AI Analysis: " + checkData.explanation);
-
       // IMPORTANT: Only upload if garbage IS detected
       if (!checkData.isGarbage) {
         alert(
@@ -140,6 +173,7 @@ const UploadReport = () => {
         areaImpact: formData.areaImpact,
         garbageType: formData.garbageType,
         imageUrl: imageUrl,
+        location: formData.location, // Include GPS location
         status: "pending",
         createdAt: serverTimestamp(),
       };
@@ -213,15 +247,32 @@ const UploadReport = () => {
         {/* GPS Location Section (Simulation) */}
         <div
           className={style.locationBox}
-          onClick={() => alert("Fetching GPS Location...")}
+          onClick={getLocation}
+          style={{ opacity: isGettingLocation ? 0.6 : 1, cursor: isGettingLocation ? "wait" : "pointer" }}
         >
           <div className={style.iconWrapper}>
             <MapPin size={24} color="#39FF14" />
           </div>
           <div className={style.locationTextWrapper}>
-            <p className={style.locationTitle}>Send GPS Location</p>
-            <p className={style.locationSub}>Auto-detect current position</p>
-          </div>
+             
+             {formData.location
+                ? <p className={style.locationTitle}>
+             location fetched
+            </p> 
+                : <p className={style.locationTitle}>
+              {isGettingLocation ? "FETCHING LOCATION..." : "SEND GPS LOCATION"}
+            </p> }
+
+            
+
+            <p className={style.locationSub}>
+              {formData.location
+                ? `Lat: ${formData.location.latitude.toFixed(4)}, Lng: ${formData.location.longitude.toFixed(4)}`
+                : "Auto-detect current position"}
+            </p>
+
+            </div>
+           
           <ChevronRight size={20} color="#666" />
         </div>
 
